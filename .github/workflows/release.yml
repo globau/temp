@@ -17,10 +17,3 @@ jobs:
 
       - name: build release
         run: cargo build --release
-
-      - name: upload binary
-        uses: actions/upload-artifact@v3
-        with:
-          name: ding-${{ matrix.os }}
-          path: target/release/ding
-
