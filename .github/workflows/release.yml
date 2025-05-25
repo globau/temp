@@ -6,7 +6,7 @@ jobs:
       matrix:
         include:
            - os: ubuntu-latest
-             name: limux
+             name: linux
            - os: macos-latest
              name: macos
         os: [ubuntu-latest, macos-latest]
@@ -62,5 +62,6 @@ jobs:
           TAG: ${{ env.TAG }}
         run: |
           gh release create $TAG \
+            --title ding-$TAG \
             --notes-file README.md \
             ./artefacts/*
