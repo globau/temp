@@ -40,10 +40,22 @@ jobs:
           path: ./artefacts
           merge-multiple: true
 
-      - name: create release
+      - name: tag
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create \
+          TAG=$(date +%Y%m%d)
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag $TAG
+          git push origin $TAG
+          echo "TAG=$TAG" >> $GITHUB_ENV
+
+      - name: create release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ env.TAG }}
+        run: |
+          gh release create $TAG \
             --notes-file README.md \
             ./artefacts/*
