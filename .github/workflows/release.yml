@@ -1,7 +1,7 @@
 name: release
 on: workflow_dispatch
 jobs:
-  release:
+  build:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
@@ -23,3 +23,24 @@ jobs:
         with:
           name: ding-${{ matrix.os }}
           path: target/release/ding
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: download artefact
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artefacts
+          merge-multiple: true
+
+      - name: create release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create ${{ github.event.inputs.tag }} \
+            --title ${{ github.event.inputs.tag }} \
+            --notes-file README.md \
+            ./artefacts/*
