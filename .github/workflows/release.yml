@@ -4,6 +4,11 @@ jobs:
   build:
     strategy:
       matrix:
+        include:
+           - os: ubuntu-latest
+             name: limux
+           - os: macos-latest
+             name: macos
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
@@ -20,13 +25,13 @@ jobs:
 
       - name: package binary
         run: |
-          zip -j ding-${{ matrix.os }}.zip target/release/ding
+          zip -j ding-${{ matrix.name }}.zip target/release/ding
 
       - name: upload
         uses: actions/upload-artifact@v4
         with:
-          name: ding-${{ matrix.os }}
-          path: ding-${{ matrix.os }}.zip
+          name: ding-${{ matrix.name }}
+          path: ding-${{ matrix.name }}.zip
 
   release:
     needs: build
