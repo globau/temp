@@ -49,10 +49,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          TAG=$(date +%Y%m%d)
+          TAG=$(git rev-parse --short HEAD)
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag -f $TAG
+          git tag $TAG
           git push origin $TAG
           echo "TAG=$TAG" >> $GITHUB_ENV
 
