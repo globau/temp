@@ -18,11 +18,15 @@ jobs:
       - name: build release
         run: cargo build --release
 
+      - name: package binary
+        run: |
+          zip -j ding-${{ matrix.os }}.zip target/release/ding
+
       - name: upload
         uses: actions/upload-artifact@v4
         with:
           name: ding-${{ matrix.os }}
-          path: target/release/ding
+          path: ding-${{ matrix.os }}.zip
 
   release:
     needs: build
@@ -40,7 +44,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create ${{ github.event.inputs.tag }} \
-            --title ${{ github.event.inputs.tag }} \
+          gh release create \
             --notes-file README.md \
             ./artefacts/*
