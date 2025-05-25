@@ -52,7 +52,7 @@ jobs:
           TAG=$(date +%Y%m%d)
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag $TAG
+          git tag -f $TAG
           git push origin $TAG
           echo "TAG=$TAG" >> $GITHUB_ENV
 
