@@ -22,6 +22,22 @@ command completed without error, otherwise an error sound will be played.
 If the command took more than five seconds to execute, the elapsed time will be
 shown."#;
 
+fn play_audio_and_wait(return_code: i32) {
+    let data = if return_code == 0 {
+        DING_SAMPLE
+    } else {
+        ERROR_SAMPLE
+    };
+    if let Ok(mut manager) = AudioManager::<DefaultBackend>::new(AudioManagerSettings::default()) {
+        if let Ok(sound) = StaticSoundData::from_cursor(Cursor::new(data)) {
+            let sound_data = sound.with_settings(StaticSoundSettings::default());
+            let duration = sound_data.duration();
+            let _ = manager.play(sound_data);
+            sleep(duration);
+        }
+    }
+}
+
 fn main() {
     let mut return_code = 0;
     let args: Vec<OsString> = env::args_os().collect();
@@ -65,31 +81,17 @@ fn main() {
                 elapsed.push_str(&format!("{}s", secs));
             }
 
-            println!("Elapsed: {}", elapsed);
+            writeln!(io::stderr(), "Elapsed: {}", elapsed).unwrap();
         }
     }
 
     unsafe {
         match fork() {
             Ok(ForkResult::Child) => {
-                let data = if return_code == 0 {
-                    DING_SAMPLE
-                } else {
-                    ERROR_SAMPLE
-                };
-                let mut manager =
-                    AudioManager::<DefaultBackend>::new(AudioManagerSettings::default()).unwrap();
-                let sound_data = StaticSoundData::from_cursor(Cursor::new(data))
-                    .unwrap()
-                    .with_settings(StaticSoundSettings::default());
-                let duration = sound_data.duration();
-                manager.play(sound_data).unwrap();
-                sleep(duration);
+                play_audio_and_wait(return_code);
                 exit(0);
             }
-            Ok(ForkResult::Parent { .. }) => {
-                exit(return_code);
-            }
+            Ok(ForkResult::Parent { .. }) => exit(return_code),
             Err(err) => {
                 eprintln!("fork failed: {}", err);
                 exit(1);

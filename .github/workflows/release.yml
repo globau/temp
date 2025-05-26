@@ -6,7 +6,9 @@ jobs:
       matrix:
         include:
            - os: ubuntu-latest
-             name: linux
+             name: linux-x86
+           - os: ubuntu-24.04-arm
+             name: linux-arm
            - os: macos-latest
              name: macos
         os: [ubuntu-latest, macos-latest]
